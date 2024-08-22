@@ -83,21 +83,18 @@ const act_types = [
     "Assigned",
 ]
 
-const TaskDetails = () => {
+const TaskDetails = ({item}) => {
     const { id } = useParams()
     const { data, isLoading, refetch } = useGetSingleTaskQuery(id)
 
     const [selected, setSelected] = useState(0)
     const task = data?.task
 
-    if (isLoading)
-        return (
-            <div className="py-10">
-                <Loading />
-            </div>
-        )
-
+    const formattedDate = task?.createdAt ? new Date(task.createdAt).toLocaleDateString() : 'N/A';
+    const formattedTime = task?.createdAt ? new Date(task.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
+  
     return (
+        
         <div className="w-full flex flex-col gap-3 mb-4 overflow-y-hidden">
             <h1 className="text-2xl text-gray-600 font-bold">{task?.title}</h1>
 
@@ -131,7 +128,7 @@ const TaskDetails = () => {
                                         <div
                                             className={clsx(
                                                 "w-4 h-4 rounded-full",
-                                                TASK_TYPE[task.stage]
+                                                TASK_TYPE[task?.stage]
                                             )}
                                         />
                                         <span className="text-black uppercase">
@@ -141,7 +138,9 @@ const TaskDetails = () => {
                                 </div>
 
                                 <p className="text-gray-500">
-                                    Created At:{" "}
+                                    Created At:{""}
+                                    {" "+formattedDate+" "}
+                                    {formattedTime}
                                     
                                 </p>
 
@@ -263,7 +262,6 @@ const TaskDetails = () => {
         </div>
     )
 }
-
 const Activities = ({ activity, id, refetch }) => {
     const [selected, setSelected] = useState(act_types[0])
     const [text, setText] = useState("")
@@ -291,7 +289,13 @@ const Activities = ({ activity, id, refetch }) => {
     }
 
 
-    const Card = ({ item }) => {
+    const Card = ({item}) => {
+        console.log('Item:', item);
+        console.log('Item By:', item?.date);
+        const formattedDate = item?.date ? new Date(item.date).toLocaleDateString() : 'N/A';
+        const formattedTime = item?.date ? new Date(item.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A';
+        
+
         return (
             <div className="flex space-x-4">
                 <div className="flex flex-col items-center flex-shrink-0">
@@ -306,9 +310,10 @@ const Activities = ({ activity, id, refetch }) => {
                 <div className="flex flex-col gap-y-1 mb-8">
                     <p className="font-semibold">{item?.by?.name}</p>
                     <div className="text-gray-500 space-y-2">
-                        <span className="capitalize">{ item?.type }</span>
+                        <span className="capitalize">{ (item?.type) }</span>
                         <span className="text-sm">
-                        {/* ({timenow}) */}
+                        {" "+formattedDate+" "} 
+                        {formattedTime}
                         </span>
                     </div>
                     <div className="text-gray-700">{ item?.activity }</div>
@@ -373,4 +378,5 @@ const Activities = ({ activity, id, refetch }) => {
         </div>
     )
 }
-export default TaskDetails
+
+export default TaskDetails;
