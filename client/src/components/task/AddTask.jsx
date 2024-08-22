@@ -19,21 +19,37 @@ import {
     useUpdateTaskMutation,
 } from "../../redux/slices/api/taskApiSlice"
 import { toast } from "sonner"
-import { dateFormatter } from "../../utils"
+
+
+// import { dateFormatter, timeFormatter } from "../../utils"
 
 const LISTS = ["TODO", "IN PROGRESS", "COMPLETED"]
 const PRIORIRY = ["HIGH", "MEDIUM", "NORMAL", "LOW"]
 
 const uploadedFileURLs = []
+// export const formatDate = (dateString) => {
+//     if (!dateString) return 'No date available';
+//     const date = new Date(dateString);
+//     const options = {
+//         year: 'numeric',
+//         month: 'short',
+//         day: 'numeric',
+//         hour: '2-digit',
+//         minute: '2-digit',
+//         hour12: false,
+//         timeZone: 'Asia/Kolkata'
+//     };
+//     return new Intl.DateTimeFormat('en-US', options).format(date);
+// };
 
-const AddTask = ({ open, setOpen, task }) => {
+export const AddTask = ({ open, setOpen, task }) => {
     const defaultValues = {
         title: task?.title || "",
-        date: dateFormatter(task?.date || new Date()),
+        date: task?.date || "",
         team: [],
         stage: "",
         priority: "",
-        assets: [],
+        assets: []
     }
 
     const {
@@ -41,6 +57,7 @@ const AddTask = ({ open, setOpen, task }) => {
         handleSubmit,
         formState: { errors },
     } = useForm({ defaultValues })
+
 
     const [team, setTeam] = useState(task?.team || [])
     const [stage, setStage] = useState(task?.stage?.toUpperCase() || LISTS[0])
@@ -57,6 +74,7 @@ const AddTask = ({ open, setOpen, task }) => {
     const submitHandler = async (data) => {
         for (const file of assets) {
             setUploading(true)
+            console.log(AddTask);
             try {
                 await uploadFile(file)
             } catch (error) {
@@ -79,7 +97,7 @@ const AddTask = ({ open, setOpen, task }) => {
             const res = task?._id
                 ? await updateTask({ ...newData, _id: task._id }).unwrap()
                 : await createTask(newData).unwrap()
-
+            console.log(AddTask)
             toast.success(res.message)
 
             setTimeout(() => {
@@ -105,7 +123,7 @@ const AddTask = ({ open, setOpen, task }) => {
 
         return new Promise((resolve, reject) => {
             uploadTask.on(
-                "state_changed", // or 'state_changed'
+                "state_changed", 
                 (snapshot) => {
                     console.log("Uploading")
                 },
@@ -135,10 +153,12 @@ const AddTask = ({ open, setOpen, task }) => {
                         className="text-base font-bold leading-6 text-gray-900 mb-4"
                     >
                         {task ? "UPDATE TASK" : "ADD TASK"}
+                        
                     </Dialog.Title>
+                    
 
-                    <div className="mt-2 flex flex-col gap-6">
-                        <Textbox
+                    <div className="mt-2 flex flex-col gap-6 gap-3">
+                    {task ? "" : <Textbox
                             placeholder="Task Title"
                             type="text"
                             name="title"
@@ -148,36 +168,48 @@ const AddTask = ({ open, setOpen, task }) => {
                                 required: "Title is required",
                             })}
                             error={errors.title ? errors.title.message : ""}
-                        />
 
-                        <UserList setTeam={setTeam} team={team} />
+                        />}
 
-                        <div className="flex gap-4">
-                            <SelectList
-                                label="Task Stage"
-                                lists={LISTS}
-                                selected={stage}
-                                setSelected={setStage}
-                            />
-
-                            <div className="w-full">
-                                <Textbox
-                                    placeholder="Date"
-                                    type="date"
-                                    name="date"
-                                    label="Task Date"
-                                    className="w-full rounded"
-                                    register={register("date", {
-                                        required: "Date is required!",
-                                    })}
-                                    error={
-                                        errors.date ? errors.date.message : ""
-                                    }
-                                />
+                        
+                    <div className="w-full flex items-end mt-3">
+                        {task ? "" : (
+                            <div className="flex w-full gap-3">
+                                <div className="w-1/2">
+                                <UserList setTeam={setTeam} team={team} />
+                                </div>
+                                <div className="w-1/2">
+                                    <Textbox
+                                        placeholder="Date"
+                                        type="datetime-local"
+                                        name="date"
+                                        label="Task Date"
+                                        className="w-full rounded"
+                                        register={register("date", {
+                                            required: "Date is required!",
+                                        })}
+                                    />
+                                </div>
                             </div>
-                        </div>
+                        )}
+                    </div>
 
-                        <div className="flex gap-4">
+                        { (
+                            <div className="w-full flex gap-2">
+                                <div className="w-1/2">
+                                    <SelectList
+                                        label="Task Stage"
+                                        lists={LISTS}
+                                        selected={stage}
+                                        setSelected={setStage}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                            
+                       
+                        {task ? "" : <div className="flex gap-4">
                             <SelectList
                                 label="Priority Level"
                                 lists={PRIORIRY}
@@ -202,9 +234,9 @@ const AddTask = ({ open, setOpen, task }) => {
                                     <span>Add Assets</span>
                                 </label>
                             </div>
-                        </div>
+                        </div>}
 
-                        <div className="bg-gray-50 py-6 sm:flex sm:flex-row-reverse gap-4">
+                        <div className="bg-gray-50 py-6 sm:flex sm:flex-row-reverse gap-2">
                             {uploading ? (
                                 <span className="text-sm py-2 text-red-500">
                                     Uploading assets

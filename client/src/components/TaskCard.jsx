@@ -7,7 +7,7 @@ import {
     MdKeyboardDoubleArrowUp,
 } from "react-icons/md"
 import { useSelector } from "react-redux"
-import { BGS, PRIOTITYSTYELS, TASK_TYPE, formatDate } from "../utils"
+import { BGS, PRIOTITYSTYELS, TASK_TYPE } from "../utils"
 import TaskDialog from "./task/TaskDialog"
 import { BiMessageAltDetail } from "react-icons/bi"
 import { FaList } from "react-icons/fa"
@@ -21,45 +21,79 @@ const ICONS = {
     low: <MdKeyboardArrowDown />,
 }
 
+export function formatDate(dateString) {
+    const date = new Date(dateString);
+    const isoString = date.toISOString();
+    const [datePart, timePart] = isoString.split('T');
+    const time = timePart.slice(0, 5); 
+    return `${datePart} ${time}`;
+}
+
+function calculateDaysDue(dateString) {
+    const dueDate = new Date(dateString);
+    const currentDate = new Date();
+    const timeDifference = dueDate - currentDate;
+    const daysDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+
+    if (daysDifference === 0) {
+        return "today";
+    }else if (daysDifference > 2) {
+        return `${daysDifference} days`;
+    } else {
+        return `${Math.abs(daysDifference)} days`;
+    }
+}
+
+const isDatePassed = (taskDate) => {
+    const currentDate = new Date()
+    const date = new Date(taskDate)
+    return date < currentDate;
+}
+
 const TaskCard = ({ task }) => {
     const { user } = useSelector((state) => state.auth)
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(false);
+  
+    const isTaskDue = task && task.stage !== "completed" && isDatePassed(task.date)
 
     return (
-        <>
+        <>  
             <div className="w-full h-fit bg-white shadow-md p-4 rounded">
                 <div className="w-full flex justify-between">
-                    <div
-                        className={clsx(
-                            "flex flex-1 gap-1 items-center text-sm font-medium",
-                            PRIOTITYSTYELS[task?.priority]
-                        )}
-                    >
-                        <span className="text-lg">{ICONS[task?.priority]}</span>
+                    <div className="flex flex-1 gap-1 items-center text-sm font-medium">
+                        <span
+                            className={clsx(
+                                "text-lg",
+                                PRIOTITYSTYELS[task?.priority]
+                            )}
+                        >
+                            {ICONS[task?.priority]}
+                        </span>
                         <span className="uppercase">
                             {task?.priority} Priority
                         </span>
-                    </div>
+                        {isTaskDue && (
+                            <span className="text-red-500 font-semibold ml-2">
+                                DUE ({calculateDaysDue(task.date)})</span>
 
+                        )}
+                    </div>
                     {<TaskDialog task={task} />}
                 </div>
 
-                <>
-                    <div className="flex items-center gap-2">
-                        <div
-                            className={clsx(
-                                "w-4 h-4 rounded-full",
-                                TASK_TYPE[task.stage]
-                            )}
-                        />
-                        <h4 className="line-clamp-1 text-black">
-                            {task?.title}
-                        </h4>
-                    </div>
-                    <span className="text-sm text-gray-600">
-                        {formatDate(new Date(task?.date))}
-                    </span>
-                </>
+                <div className="flex items-center gap-2">
+                    <div
+                        className={clsx(
+                            "w-4 h-4 rounded-full",
+                            TASK_TYPE[task.stage]
+                        )}
+                    />
+                    <h4 className="line-clamp-1 text-black">
+                        {task?.title}
+                    </h4>
+                </div>
+                <span className="text-sm text-gray-600">
+                {task?.date ? formatDate(task.date) : ''}</span>
 
                 <div className="w-full border-t border-gray-200 my-2" />
                 <div className="flex items-center justify-between mb-2">
@@ -93,42 +127,39 @@ const TaskCard = ({ task }) => {
                     </div>
                 </div>
 
-                {/* sub tasks */}
+                {/* Subtasks */}
                 {task?.subTasks?.length > 0 ? (
                     <div className="py-4 border-t border-gray-200">
                         <h5 className="text-base line-clamp-1 text-black">
                             {task?.subTasks[0].title}
                         </h5>
-
                         <div className="p-4 space-x-8">
                             <span className="text-sm text-gray-600">
-                                {formatDate(new Date(task?.subTasks[0]?.date))}
+                                {task?.subTasks[0].date}
                             </span>
-                            <span className="bg-blue-600/10 px-3 py-1 rounded0full text-blue-700 font-medium">
+                            <span className="bg-blue-600/10 px-3 py-1 rounded-full text-blue-700 font-medium">
                                 {task?.subTasks[0].tag}
                             </span>
                         </div>
                     </div>
                 ) : (
-                    <>
-                        <div className="py-4 border-t border-gray-200">
-                            <span className="text-gray-500">No Sub Task</span>
-                        </div>
-                    </>
+                    <div className="py-4 border-t border-gray-200">
+                        <span className="text-gray-500">No Sub Task</span>
+                    </div>
                 )}
 
                 <div className="w-full pb-2">
                     <button
                         onClick={() => setOpen(true)}
                         disabled={user.isAdmin ? false : true}
-                        className="w-full flex gap-4 items-center text-sm text-gray-500 font-semibold disabled:cursor-not-allowed disabled::text-gray-300"
+                        className="w-full flex gap-4 items-center text-sm text-gray-500 font-semibold disabled:cursor-not-allowed disabled:text-gray-300"
                     >
                         <IoMdAdd className="text-lg" />
                         <span>ADD SUBTASK</span>
                     </button>
                 </div>
             </div>
-
+       
             <AddSubTask open={open} setOpen={setOpen} id={task._id} />
         </>
     )

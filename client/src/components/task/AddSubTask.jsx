@@ -54,7 +54,7 @@ const AddSubTask = ({ open, setOpen, id }) => {
                         <div className="flex items-center gap-4">
                             <Textbox
                                 placeholder="Date"
-                                type="date"
+                                type="datetime-local"
                                 name="date"
                                 label="Task Date"
                                 className="w-full rounded"

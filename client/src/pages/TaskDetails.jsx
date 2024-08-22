@@ -1,6 +1,6 @@
 import clsx from "clsx"
 import moment from "moment"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { FaBug, FaTasks, FaThumbsUp, FaUser } from "react-icons/fa"
 import { GrInProgress } from "react-icons/gr"
 import {
@@ -23,13 +23,6 @@ import {
     useGetSingleTaskQuery,
     usePostTaskActivityMutation,
 } from "../redux/slices/api/taskApiSlice"
-
-const assets = [
-    "https://images.pexels.com/photos/2418664/pexels-photo-2418664.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    "https://images.pexels.com/photos/8797307/pexels-photo-8797307.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    "https://images.pexels.com/photos/2534523/pexels-photo-2534523.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-    "https://images.pexels.com/photos/804049/pexels-photo-804049.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-]
 
 const ICONS = {
     high: <MdKeyboardDoubleArrowUp />,
@@ -149,7 +142,7 @@ const TaskDetails = () => {
 
                                 <p className="text-gray-500">
                                     Created At:{" "}
-                                    {new Date(task?.date).toDateString()}
+                                    
                                 </p>
 
                                 <div className="flex items-center gap-8 p-4 border-y border-gray-200">
@@ -223,9 +216,7 @@ const TaskDetails = () => {
                                                 <div className="space-y-1">
                                                     <div className="flex gap-2 items-center">
                                                         <span className="text-sm text-gray-500">
-                                                            {new Date(
-                                                                el?.date
-                                                            ).toDateString()}
+                                                            {formatDate(task?.date)}
                                                         </span>
 
                                                         <span className="px-2 py-0.5 text-center text-sm rounded-full bg-violet-100 text-violet-700 font-semibold">
@@ -299,6 +290,7 @@ const Activities = ({ activity, id, refetch }) => {
         }
     }
 
+
     const Card = ({ item }) => {
         return (
             <div className="flex space-x-4">
@@ -314,12 +306,12 @@ const Activities = ({ activity, id, refetch }) => {
                 <div className="flex flex-col gap-y-1 mb-8">
                     <p className="font-semibold">{item?.by?.name}</p>
                     <div className="text-gray-500 space-y-2">
-                        <span className="capitalize">{item?.type}</span>
+                        <span className="capitalize">{ item?.type }</span>
                         <span className="text-sm">
-                            {moment(item?.date).fromNow()}
+                        {/* ({timenow}) */}
                         </span>
                     </div>
-                    <div className="text-gray-700">{item?.activity}</div>
+                    <div className="text-gray-700">{ item?.activity }</div>
                 </div>
             </div>
         )

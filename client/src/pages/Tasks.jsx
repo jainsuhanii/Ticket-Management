@@ -80,7 +80,6 @@ const Tasks = () => {
                     </div>
                 )}
             </Tabs>
-
             <AddTask open={open} setOpen={setOpen} />
         </div>
     )

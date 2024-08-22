@@ -1,9 +1,17 @@
 import mongoose, { Schema } from "mongoose"
+import moment from "moment-timezone"
 
+function convertToIST(date) {
+    let utcDate = new Date(date);
+    let utcTime = utcDate.getTime();
+    let istOffset = 5.5 * 60 * 60 * 1000;
+    let istDate = new Date(utcTime + istOffset);
+    return istDate;
+}
 const taskSchema = new Schema(
     {
         title: { type: String, required: true },
-        date: { type: Date, default: new Date() },
+        date: { type: Date,  default: () => moment().tz('Asia/Kolkata').toDate()  },
         priority: {
             type: String,
             default: "normal",
@@ -29,7 +37,7 @@ const taskSchema = new Schema(
                     ],
                 },
                 activity: String,
-                date: { type: Date, default: new Date() },
+                date: { type: Date,  default: () => moment().tz('Asia/Kolkata').toDate()},
                 by: { type: Schema.Types.ObjectId, ref: "User" },
             },
         ],
@@ -46,7 +54,13 @@ const taskSchema = new Schema(
         isTrashed: { type: Boolean, default: false },
     },
     { timestamps: true }
-)
+);
+
+// Pre-save hook to convert date to IST
+taskSchema.pre('save', function(next) {
+    this.date = convertToIST(this.date);
+    next();
+});
 
 const Task = mongoose.model("Task", taskSchema)
 

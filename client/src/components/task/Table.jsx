@@ -1,3 +1,4 @@
+
 import React, { useState } from "react"
 import { BiMessageAltDetail } from "react-icons/bi"
 import {
@@ -7,7 +8,7 @@ import {
     MdKeyboardDoubleArrowUp,
 } from "react-icons/md"
 import { toast } from "sonner"
-import { BGS, PRIOTITYSTYELS, TASK_TYPE, formatDate } from "../../utils"
+import { BGS, PRIOTITYSTYELS, TASK_TYPE } from "../../utils"
 import clsx from "clsx"
 import { FaList, FaWindowRestore } from "react-icons/fa"
 import UserInfo from "../UserInfo"
@@ -103,7 +104,7 @@ const Table = ({ tasks }) => {
 
             <td className="py-2">
                 <span className="text-sm text-gray-600">
-                    {formatDate(new Date(task?.date))}
+                Date 2
                 </span>
             </td>
 

@@ -159,7 +159,7 @@ const TaskDialog = ({ task }) => {
                 open={openEdit}
                 setOpen={setOpenEdit}
                 task={task}
-                key={new Date().getTime()}
+                key= {task?.date}
             />
 
             <AddSubTask open={open} setOpen={setOpen} />
