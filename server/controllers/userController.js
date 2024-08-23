@@ -159,6 +159,7 @@ export const updateUserProfile = async (req, res) => {
     }
 }
 
+
 export const markNotificationRead = async (req, res) => {
     try {
         const { userId } = req.user
@@ -185,6 +186,7 @@ export const markNotificationRead = async (req, res) => {
         return res.status(400).json({ status: false, message: error.message })
     }
 }
+
 
 export const changeUserPassword = async (req, res) => {
     try {

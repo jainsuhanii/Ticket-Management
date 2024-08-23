@@ -1,29 +1,24 @@
 import Notice from "../models/notification.js";
 import Task from "../models/task.js";
 import User from "../models/user.js";
-import moment from "moment-timezone";
 
 
-
-export const createTask = async (req, res) => {
-  try {
-    const { userId } = req.user;
-
-    const { title, team, stage, date, priority, assets } = req.body;
-
-    let text = "New task has been assigned to you";
-    if (team?.length > 1) {
-      text = text + ` and ${team?.length - 1} others.`;
-    }
-
-    const formattedDate = moment(date).tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-
-
-    text =
-      text +
-      ` The task priority is set a ${priority} priority, so check and act accordingly. The task date is ${new Date(
-        date
-      ).toDateString()}. Thank you!!!`;
+    export const createTask = async (req, res) => {
+      try {
+        const { userId } = req.user;
+    
+        const { title, team, stage, date, priority, assets } = req.body;
+    
+        let text = "New task has been assigned to you";
+        if (team?.length > 1) {
+          text = text + ` and ${team?.length - 1} others.`;
+        }
+    
+        text =
+          text +
+          ` The task priority is set a ${priority} priority, so check and act accordingly. The task date is ${new Date(
+            date
+          ).toDateString()}. Thank you!!!`;
 
     const activity = {
       type: "assigned",
@@ -35,7 +30,7 @@ export const createTask = async (req, res) => {
       title,
       team,
       stage: stage.toLowerCase(),
-      date:formattedDate,
+      date: new Date(date),
       priority: priority.toLowerCase(),
       assets,
       activities: activity,
@@ -291,7 +286,7 @@ export const updateTask = async (req, res) => {
     const task = await Task.findById(id);
 
     task.title = title;
-    task.date = formattedDate;
+    task.date = new Date(date);
     task.priority = priority.toLowerCase();
     task.assets = assets;
     task.stage = stage.toLowerCase();
